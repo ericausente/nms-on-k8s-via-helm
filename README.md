@@ -45,3 +45,82 @@ ingestion      ClusterIP      10.100.255.99    <none>                           
 integrations   ClusterIP      10.100.103.39    <none>                                                                         8037/TCP                     32h
 ```
 
+
+
+=======
+Now with persistence enabled, I need some extra steps to do: 
+```
+% helm install -n nms --set nms-hybrid.adminPasswordHash=$(openssl passwd -1 'YourPassword123#')  --set nms-hybrid.apigw.image.repository=ausente/nms-apigw --set nms-hybrid.apigw.image.tag=2.9.1 --set  nms-hybrid.core.image.repository=ausente/nms-core --set nms-hybrid.core.image.tag=2.9.1 --set nms-hybrid.dpm.image.repository=ausente/nms-dpm --set nms-hybrid.dpm.image.tag=2.9.1 --set nms-hybrid.ingestion.image.repository=ausente/nms-ingestion --set nms-hybrid.ingestion.image.tag=2.9.1 --set nms-hybrid.integrations.image.repository=ausente/nms-integrations --set nms-hybrid.integrations.image.tag=2.9.1 nms nginx-stable/nms --create-namespace --wait
+```
+
+```
+% kubectl get pvc -A
+NAMESPACE   NAME                  STATUS    VOLUME   CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+nms         clickhouse            Pending                                      gp2            4m56s
+nms         core-dqlite           Pending                                      gp2            4m56s
+nms         core-secrets          Pending                                      gp2            4m56s
+nms         dpm-dqlite            Pending                                      gp2            4m56s
+nms         dpm-nats-streaming    Pending                                      gp2            4m56s
+nms         integrations-dqlite   Pending                                      gp2            4m56s
+```
+
+Go to your AWS Management Console 
+and Create an EFS
+
+Amazon EFS > File systems > fs-05c72f459842501f3
+
+Elastic (Recommended)
+Use this mode for workloads with unpredictable I/O. With Elastic mode, your throughput scales automatically and you only pay for what you use.
+
+
+Next, we need to create a Storage Class and provide the FileSystemId of the newly created file system:
+
+
+#sc.yaml
+----
+```
+kind: StorageClass
+apiVersion: storage.k8s.io/v1
+metadata:
+  name: efs-sc
+provisioner: efs.csi.aws.com
+parameters:
+  provisioningMode: efs-ap
+  fileSystemId: fs-05c72f459842501f3
+  directoryPerms: "700"
+```
+
+Create and verify the Storage Class:
+
+```
+$ kubectl apply -f sc.yaml 
+storageclass.storage.k8s.io/efs-sc created
+
+$ kubectl get sc
+NAME            PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE      ALLOWVOLUMEEXPANSION   AGE
+efs-sc          efs.csi.aws.com         Delete          Immediate              false                  4s
+gp2 (default)   kubernetes.io/aws-ebs   Delete          WaitForFirstConsumer   false                  2d5h
+```
+
+
+Next, we create the PV manifest file and provide the FileSystemId of the newly created file system.
+
+#pv1.yaml
+---
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: efs-pv1
+spec:
+  capacity:
+    storage: 5Gi
+  volumeMode: Filesystem
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: efs-sc
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: efs.csi.aws.com
+    volumeHandle: fs-05c72f459842501f3
+ ```
