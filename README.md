@@ -124,3 +124,17 @@ spec:
     driver: efs.csi.aws.com
     volumeHandle: fs-05c72f459842501f3
  ```
+ 
+ Do the same until pv6... 
+ 
+ ```
+ ~ % kubectl get pv
+NAME      CAPACITY   ACCESS MODES   RECLAIM POLICY   STATUS   CLAIM                     STORAGECLASS   REASON   AGE
+efs-pv1   5Gi        RWO            Retain           Bound    nms/integrations-dqlite   efs-sc                  3h18m
+efs-pv2   5Gi        RWO            Retain           Bound    nms/core-dqlite           efs-sc                  20s
+efs-pv3   5Gi        RWO            Retain           Bound    nms/core-secrets          efs-sc                  17s
+efs-pv4   5Gi        RWO            Retain           Bound    nms/clickhouse            efs-sc                  14s
+efs-pv5   5Gi        RWO            Retain           Bound    nms/dpm-dqlite            efs-sc                  11s
+efs-pv6   5Gi        RWO            Retain           Bound    nms/dpm-nats-streaming    efs-sc                  7s
+```
+
