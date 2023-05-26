@@ -13,9 +13,29 @@ This guide assumes the following:
 More information on:
 https://docs.nginx.com/nginx-management-suite/admin-guides/installation/kubernetes/nms-helm/
 
+
 Install NMS using Helm, specifying your desired configuration options. For example:
+
 ```
-helm install -n nms --set nms-hybrid.adminPasswordHash=$(openssl passwd -1 'YourPassword123#') --set nms-hybrid.core.persistence.enabled=false --set nms-hybrid.integrations.persistence.enabled=false --set nms-hybrid.dpm.persistence.enabled=false --set nms-hybrid.nmsClickhouse.persistence.enabled=false --set nms-hybrid.apigw.image.repository=ausente/nms-apigw --set nms-hybrid.apigw.image.tag=2.9.1 --set  nms-hybrid.core.image.repository=ausente/nms-core --set nms-hybrid.core.image.tag=2.9.1 --set nms-hybrid.dpm.image.repository=ausente/nms-dpm --set nms-hybrid.dpm.image.tag=2.9.1 --set nms-hybrid.ingestion.image.repository=ausente/nms-ingestion --set nms-hybrid.ingestion.image.tag=2.9.1 --set nms-hybrid.integrations.image.repository=ausente/nms-integrations --set nms-hybrid.integrations.image.tag=2.9.1 nms nginx-stable/nms --create-namespace --wait
+helm install -n nms \
+  --set nms-hybrid.adminPasswordHash=$(openssl passwd -1 'YourPassword123#') \
+  --set nms-hybrid.core.persistence.enabled=false \
+  --set nms-hybrid.integrations.persistence.enabled=false \
+  --set nms-hybrid.dpm.persistence.enabled=false \
+  --set nms-hybrid.nmsClickhouse.persistence.enabled=false \
+  --set nms-hybrid.apigw.image.repository=ausente/nms-apigw \
+  --set nms-hybrid.apigw.image.tag=2.9.1 \
+  --set nms-hybrid.core.image.repository=ausente/nms-core \
+  --set nms-hybrid.core.image.tag=2.9.1 \
+  --set nms-hybrid.dpm.image.repository=ausente/nms-dpm \
+  --set nms-hybrid.dpm.image.tag=2.9.1 \
+  --set nms-hybrid.ingestion.image.repository=ausente/nms-ingestion \
+  --set nms-hybrid.ingestion.image.tag=2.9.1 \
+  --set nms-hybrid.integrations.image.repository=ausente/nms-integrations \
+  --set nms-hybrid.integrations.image.tag=2.9.1 \
+  nms nginx-stable/nms \
+  --create-namespace \
+  --wait
 ```
 
 This command will deploy NMS with the specified configuration options. Note that the adminPasswordHash option specifies the hashed password for the NMS administrator account.
