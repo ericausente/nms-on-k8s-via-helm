@@ -1,0 +1,46 @@
+# values.yaml
+global:
+    nmsModules:
+      nms-acm:
+        enabled: true
+nms-acm:
+    imagePullSecrets:
+        - name: dockerregcred
+    acm:
+        image:
+            repository: ausente/nms-acm
+            tag: 1.6.0
+        persistence:
+            enabled: false
+nms-hybrid:
+    imagePullSecrets:
+        - name: dockerregcred
+    apigw:
+        image:
+            repository: ausente/nms-apigw
+            tag: 2.9.1
+    core:
+        image:
+            repository: ausente/nms-core
+            tag: 2.9.1
+        persistence:
+            enabled: false
+    dpm:
+        image:
+            repository: ausente/nms-dpm
+            tag: 2.9.1
+        persistence:
+            enabled: false
+    ingestion:
+        image:
+            repository: ausente/nms-ingestion
+            tag: 2.9.1
+    integrations:
+        image:
+            repository: ausente/nms-integrations
+            tag: 2.9.1
+        persistence:
+            enabled: false
+    nmsClickhouse:
+        persistence:
+            enabled: false
